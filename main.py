@@ -115,9 +115,14 @@ def iniciar_sesion(log: Login, db:Session = Depends(get_db)):
     }
     
 @app.put("/usuarios/{id}", response_model=UserResponse)
-def modificar_usuario(id:int, user_mod: UserCreate, db:Session = Depends(get_db)):
+def modificar_usuario(id:int, user_mod: UserCreate, db:Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
     
     user = db.query(UserDB).filter(UserDB.id == id).first()
+    
+    if current_user.id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="No tienes permiso para modificar este usuario"
+        )
     
     if not user:
         raise HTTPException(
@@ -137,9 +142,15 @@ def modificar_usuario(id:int, user_mod: UserCreate, db:Session = Depends(get_db)
     return user
 
 @app.delete("/usuarios/{id}")
-def eliminar_usuario(id:int , db:Session = Depends(get_db)):
+def eliminar_usuario(id:int , db:Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
     
     user = db.query(UserDB).filter(UserDB.id == id).first()
+    
+    if current_user.id != id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="No tienes permiso para eliminar este usuario"
+        )
     
     if not user:
         raise HTTPException(
@@ -154,13 +165,19 @@ def eliminar_usuario(id:int , db:Session = Depends(get_db)):
     }
     
 @app.delete("/productos/{id}")
-def eliminar_productos(id:int , db:Session = Depends(get_db)):
+def eliminar_productos(id:int , db:Session = Depends(get_db), current_user:UserDB = Depends(get_current_user)):
     
     productos = db.query(ProductosDB).filter(ProductosDB.id == id).first()
     
     if not productos:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND
+        )
+        
+    if productos.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="No puedes eliminar un producto que no te pertenece"
         )
         
     db.delete(productos)

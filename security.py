@@ -4,6 +4,8 @@ from datetime import datetime, timedelta,timezone
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_EXPIRE_TIME = 30
