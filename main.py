@@ -114,50 +114,28 @@ def iniciar_sesion(log: Login, db:Session = Depends(get_db)):
         "token type": "bearer",
     }
     
-@app.put("/usuarios/{id}", response_model=UserResponse)
-def modificar_usuario(id:int, user_mod: UserCreate, db:Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
+@app.put("/usuarios/me", response_model=UserResponse)
+def modificar_usuario(user_mod: UserCreate, db:Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
     
-    user = db.query(UserDB).filter(UserDB.id == id).first()
+
     
-    if current_user.id != id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="No tienes permiso para modificar este usuario"
-        )
-    
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Id no encontrada"
-        )
-        
-    user.nombre = user_mod.nombre
-    user.correo = user_mod.correo
+    current_user.nombre = user_mod.nombre
+    current_user.correo = user_mod.correo
     
     password_valida = encriptar_password(user_mod.password)
     
-    user.hashed_password = password_valida
+    current_user.hashed_password = password_valida
     
     db.commit()
-    db.refresh(user)
+    db.refresh(current_user)
     
-    return user
+    return current_user
 
-@app.delete("/usuarios/{id}")
-def eliminar_usuario(id:int , db:Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
+@app.delete("/usuarios/me")
+def eliminar_usuario(db:Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)):
     
-    user = db.query(UserDB).filter(UserDB.id == id).first()
     
-    if current_user.id != id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, 
-            detail="No tienes permiso para eliminar este usuario"
-        )
-    
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND
-        )
-        
-    db.delete(user)
+    db.delete(current_user)
     db.commit()
     
     return {
