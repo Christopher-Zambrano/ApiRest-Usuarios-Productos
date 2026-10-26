@@ -4,7 +4,7 @@ API RESTful desarrollada con **FastAPI** que implementa autenticación segura JW
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 * **Framework:** FastAPI
 * **Base de Datos:** SQLite (SQLAlchemy ORM)
@@ -14,7 +14,7 @@ API RESTful desarrollada con **FastAPI** que implementa autenticación segura JW
 
 ---
 
-## 📋 Características Principales
+## Características Principales
 
 *  **Seguridad Avanzada:** Encriptación de contraseñas con `bcrypt` (limitado a 72 bytes de forma segura) y expiración de tokens JWT en 30 minutos.
 *  **Rutas Protegidas:** Middlewares de autenticación mediante esquema `HTTPBearer` para verificar tokens en endpoints privados.
