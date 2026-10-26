@@ -131,6 +131,9 @@ def modificar_usuario(id:int, user_mod: UserCreate, db:Session = Depends(get_db)
     
     user.hashed_password = password_valida
     
+    db.commit()
+    db.refresh(user)
+    
     return user
 
 @app.delete("/usuarios/{id}")
